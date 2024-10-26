@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NFC Bridge Keeper</string>
+    <string name="service_name">NFC Bridge Keeper HCE Service</string>
 </resources>
