@@ -8,19 +8,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.nfcbridgekeeper.ui.theme.NFCBridgeKeeperTheme
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import java.nio.charset.Charset
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+
 
 /**
  * Notes:
@@ -37,6 +42,10 @@ import androidx.compose.runtime.*
 class MainActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
+
+    // todo: using mutable state to hold the text to be sent. wip for removing the
+    //  deprecated setNdefPushMessage usage
+    private var textToSend: String by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,26 +64,13 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
         }
 
-        enableEdgeToEdge()  //todo: is this needed?
-        setContent {
-            NFCBridgeKeeperTheme {
-//                Scaffold(
-//                    modifier = Modifier.fillMaxSize(),
-//                    containerColor = MaterialTheme.colorScheme.) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
+        //todo: set NDEF message callback
+        //todo: setNdefPushMessageCallback is an Android Beam feature and is dead boo hiss.
+        // working on a replacement implementation now...
+//        nfcAdapter?.setNdefPushMessageCallback(this, this)
 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    NFCApp(nfcAdapter = nfcAdapter)
-                }
-            }
-        }
+        enableEdgeToEdge()  //todo: is this needed?
+        setContent()
     }
 
     override fun onResume() {
@@ -92,8 +88,37 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        //pass intent to the composable
-        //todo: will be handled in the NFCApp composable
+
+        setIntent(intent)
+        setContent()
+    }
+
+    internal fun sendNfcMessage(text: String) {
+        val message = NdefMessage(
+            arrayOf(
+                NdefRecord.createMime("text/plain", text.toByteArray(Charset.forName("UTF-8")))
+            )
+        )
+        nfcAdapter?.setNdefPushMessage(message, this)
+        Toast.makeText(this, "Ready to send NFC message.", Toast.LENGTH_SHORT).show()
+    }
+
+    internal fun receiveNfcMessage(intent: Intent): String? {
+        if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+            val rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+            if (rawMessages != null) {
+                val messages = rawMessages.map { it as NdefMessage }
+                for (message in messages) {
+                    for (record in message.records) {
+                        if (record.tnf == NdefRecord.TNF_MIME_MEDIA &&
+                            String(record.type) == "text/plain") {
+                            return String(record.payload, Charset.forName("UTF-8"))
+                        }
+                    }
+                }
+            }
+        }
+        return null
     }
 
     private fun enableForegroundDispatch() {
@@ -119,20 +144,89 @@ class MainActivity : ComponentActivity() {
     private fun disableForegroundDispatch() {
         nfcAdapter?.disableForegroundDispatch(this)
     }
+
+    private fun setContent() {
+        setContent {
+            NFCBridgeKeeperTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    NFCApp(nfcAdapter = nfcAdapter)
+                }
+            }
+        }
+    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun NFCApp(nfcAdapter: NfcAdapter?) {
+    var textToSend by remember { mutableStateOf("") }
+    var receivedText by remember { mutableStateOf("Received text will appear here") }
+
+    val context = LocalContext.current
+
+    // Handle incoming NFC intents
+    LaunchedEffect(Unit) {
+        val activity = context as? ComponentActivity
+        activity?.intent?.let { intent ->
+            val received = (activity as MainActivity).receiveNfcMessage(intent)
+            if (received != null) {
+                receivedText = received
+                Toast.makeText(context, "Received: $received", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("NFC String Transfer") }
+//            )
+//        },
+        content = { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                OutlinedTextField(
+                    value = textToSend,
+                    onValueChange = { textToSend = it },
+                    label = { Text("Enter text to send") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (textToSend.isNotEmpty()) {
+                            (context as? MainActivity)?.sendNfcMessage(textToSend)
+                        } else {
+                            Toast.makeText(context, "Please enter text to send.", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Send via NFC")
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Received Text:",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = receivedText,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    NFCBridgeKeeperTheme {
-        Greeting("Android")
-    }
-}
