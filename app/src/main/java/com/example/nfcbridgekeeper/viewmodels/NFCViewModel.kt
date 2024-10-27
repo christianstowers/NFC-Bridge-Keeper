@@ -47,7 +47,7 @@ class NFCViewModel : ViewModel() {
             action == android.nfc.NfcAdapter.ACTION_TECH_DISCOVERED
         ) {
             val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG, Tag::class.java)
-//            val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG)
+//            val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG) <-- deprecated
             if (tag != null) {
                 val ndef = Ndef.get(tag)
                 if (ndef != null) {
