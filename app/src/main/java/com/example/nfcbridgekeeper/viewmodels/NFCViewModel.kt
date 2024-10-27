@@ -20,11 +20,11 @@ class NFCViewModel : ViewModel() {
         private set
 
     /**
-     * Updates the text to send and sets it in the Singleton for HostApduService.
+     * updates the text to send and sets it in the singleton for HostApduService.
      */
     fun updateTextToSend(newText: String) {
         textToSend = newText
-        // Update the Singleton to reflect the new message
+        // update the singleton to reflect the new message
         NfcMessage.messageToSend = newText
     }
 
@@ -44,7 +44,8 @@ class NFCViewModel : ViewModel() {
             action == android.nfc.NfcAdapter.ACTION_TAG_DISCOVERED ||
             action == android.nfc.NfcAdapter.ACTION_TECH_DISCOVERED
         ) {
-            val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG)
+            val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG, Tag::class.java)
+//            val tag: Tag? = intent.getParcelableExtra(android.nfc.NfcAdapter.EXTRA_TAG)
             if (tag != null) {
                 val ndef = Ndef.get(tag)
                 if (ndef != null) {

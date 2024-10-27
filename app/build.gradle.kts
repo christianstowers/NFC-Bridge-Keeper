@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.nfcbridgekeeper"
-        minSdk = 21
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
