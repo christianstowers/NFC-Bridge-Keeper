@@ -35,6 +35,7 @@ class NFCViewModel : ViewModel() {
      */
     fun updateReceivedText(newText: String) {
         receivedText = newText
+        Log.d("viewmodel", "text update: $newText")
     }
 
     /**

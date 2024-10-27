@@ -19,6 +19,7 @@ import android.app.PendingIntent
 import android.content.IntentFilter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.*
@@ -99,6 +100,7 @@ class MainActivity : ComponentActivity() {
                                         Charset.forName("UTF-8")
                                     )
                                     // Update received text
+                                    Log.d("mainactivity", "updated text in activity: $text")
                                     viewModel.updateReceivedText(text)
                                 }
                             }
