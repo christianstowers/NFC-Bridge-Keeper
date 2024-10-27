@@ -3,8 +3,7 @@
     android:description="@string/service_name"
     android:requireDeviceUnlock="false">
     <aid-group android:category="other" android:description="@string/service_name">
-        <!-- Define your custom AID here -->
-        <!--todo: create unique AID? -->
-        <aid-filter android:name="F0010203040506" />
+        <!-- AID updated from F0010203040506 to F0010203040507 -->
+        <aid-filter android:name="F0010203040507" />
     </aid-group>
 </host-apdu-service>
