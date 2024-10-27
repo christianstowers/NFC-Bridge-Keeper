@@ -5,6 +5,7 @@ import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.Tag
 import android.nfc.tech.Ndef
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ class NFCViewModel : ViewModel() {
      */
     fun updateTextToSend(newText: String) {
         textToSend = newText
+        Log.d("new letter change: %s", newText)
         // update the singleton to reflect the new message
         NfcMessage.messageToSend = newText
     }
