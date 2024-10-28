@@ -32,7 +32,7 @@ fun BridgeKeeperUI(
             ) {
                 Text(
                     text = "HCE Card Tool",
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displaySmall
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
@@ -41,7 +41,7 @@ fun BridgeKeeperUI(
                     label = { Text("Enter text to send") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 //                Text(
 //                    text = "Received Text:",
 //                    style = MaterialTheme.typography.bodySmall
@@ -51,9 +51,10 @@ fun BridgeKeeperUI(
 //                    text = receivedText,
 //                    style = MaterialTheme.typography.bodyLarge
 //                )
-                Spacer(modifier = Modifier.height(32.dp))
+//                Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = "Hold your device near another NFC-enabled device running this app to send the message.",
+                    text = "Hold your device near another NFC-enabled device running the reader " +
+                            "version of the app to send the message.",
                     style = MaterialTheme.typography.labelSmall
                 )
             }
