@@ -17,7 +17,7 @@ class NFCViewModel : ViewModel() {
     var textToSend by mutableStateOf("")
         private set
 
-    var receivedText by mutableStateOf("No message received yet")
+    var receivedText by mutableStateOf("[ no message received yet ]")
         private set
 
     /**
