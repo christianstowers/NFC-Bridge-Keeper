@@ -11,6 +11,8 @@ import java.nio.charset.Charset
 import com.example.nfcbridgekeeper.viewmodels.NFCViewModel
 import android.app.PendingIntent
 import android.content.IntentFilter
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.tech.IsoDep
 import android.nfc.tech.Ndef
 import android.util.Log
@@ -84,10 +86,14 @@ class MainActivity : ComponentActivity() {
                         Log.d("MainActivity", "APDU Response: $response")
 
                         if (response.contains("9000")) {
-                            // todo: get NDEF message from response
-                            val ndefBytes = result.copyOfRange(0, result.size - 2)
-                            val ndefMessage = String(ndefBytes, Charset.forName("UTF-8"))
-                            Log.d("MainActivity", "received NDEF Message: $ndefMessage")
+//                            // todo: get NDEF message from response
+//                            val ndefBytes = result.copyOfRange(0, result.size - 2)
+//                            val ndefMessage = String(ndefBytes, Charset.forName("UTF-8"))
+//                            Log.d("MainActivity", "received NDEF Message: $ndefMessage")
+                            // Extract NDEF message from response
+                            val ndefBytes = result.copyOfRange(0, result.size - 2) // Remove status word
+                            val ndefMessage = parseNdefMessage(ndefBytes)
+                            Log.d("MainActivity", "Received NDEF Message: $ndefMessage")
                             // todo: update received text
                             viewModel.updateReceivedText(ndefMessage)
                         } else {
@@ -138,5 +144,33 @@ class MainActivity : ComponentActivity() {
                     + Character.digit(s[i + 1], 16)).toByte()
         }
         return data
+    }
+
+    private fun parseNdefMessage(ndefBytes: ByteArray): String {
+        return try {
+            val ndefMessage = NdefMessage(ndefBytes)
+            if (ndefMessage.records.isNotEmpty()) {
+                val record = ndefMessage.records[0]
+                if (record.tnf == NdefRecord.TNF_WELL_KNOWN && record.type.contentEquals(NdefRecord.RTD_TEXT)) {
+                    val payload = record.payload
+                    val languageCodeLength = payload[0].toInt() and 0x3F
+                    String(
+                        payload,
+                        1 + languageCodeLength,
+                        payload.size - 1 - languageCodeLength,
+                        Charset.forName("UTF-8")
+                    )
+                } else {
+                    Log.e("MainActivity", "Unsupported NDEF record type.")
+                    "Unsupported record type."
+                }
+            } else {
+                Log.e("MainActivity", "No NDEF records found.")
+                "No records found."
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error parsing NDEF message: ${e.message}")
+            "Error parsing message."
+        }
     }
 }
