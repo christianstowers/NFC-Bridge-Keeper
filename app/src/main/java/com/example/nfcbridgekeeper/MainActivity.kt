@@ -3,26 +3,16 @@ package com.example.nfcbridgekeeper
 
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.*
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.nfcbridgekeeper.ui.theme.NFCBridgeKeeperTheme
 import android.content.Intent
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import java.nio.charset.Charset
 import com.example.nfcbridgekeeper.viewmodels.NFCViewModel
 import android.app.PendingIntent
 import android.content.IntentFilter
-import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.util.Log
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.runtime.*
 import com.example.nfcbridgekeeper.ui.theme.BridgeKeeperUI
 
 /**
@@ -45,10 +35,9 @@ class MainActivity : ComponentActivity() {
         // Initialize NFC Adapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter == null) {
-            // NFC is not available on this device
-            // Optionally, inform the user and disable NFC features
-            // For example, show a dialog or a Toast message
             Log.d("MainActivity", "NFC is not available on this device.")
+            finish()
+            return
         }
 
         // Create a generic PendingIntent that will be delivered to this activity.
