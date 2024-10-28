@@ -14,10 +14,13 @@ fun BridgeKeeperUI(
     onTextChange: (String) -> Unit,
     receivedText: String
 ) {
+    /**
+     * The version of the app on the feature/initial-build branch is the HCE Card actor. Note that
+     * the onscreen titles differ to aid in distinguishing the tools.
+     */
     Scaffold(
-        //todo: remove top bar?
         topBar = {
-            TopAppBar(title = { Text("NFC String Exchange") })
+            TopAppBar(title = { Text("NFC Bridge Keeper") })
         },
         content = { padding ->
             Column(
@@ -27,6 +30,11 @@ fun BridgeKeeperUI(
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
+                Text(
+                    text = "HCE Card Tool",
+                    style = MaterialTheme.typography.displayLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = textToSend,
                     onValueChange = onTextChange,
@@ -34,15 +42,15 @@ fun BridgeKeeperUI(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Received Text:",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = receivedText,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+//                Text(
+//                    text = "Received Text:",
+//                    style = MaterialTheme.typography.bodySmall
+//                )
+//                Spacer(modifier = Modifier.height(8.dp))
+//                Text(
+//                    text = receivedText,
+//                    style = MaterialTheme.typography.bodyLarge
+//                )
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(
                     text = "Hold your device near another NFC-enabled device running this app to send the message.",

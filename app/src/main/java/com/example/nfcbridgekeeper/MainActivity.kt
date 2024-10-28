@@ -25,6 +25,11 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.*
 import com.example.nfcbridgekeeper.ui.theme.BridgeKeeperUI
 
+/**
+ * The version of the app on the feature/initial-build branch is the HCE Card actor. For the Reader
+ * Tool, checkout and build from feature/reader-mode.
+ */
+
 class MainActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
