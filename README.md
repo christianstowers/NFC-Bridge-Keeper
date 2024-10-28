@@ -8,6 +8,10 @@ Currently, the delineation between the HCE card actor and NFC reader versions of
 - feature/initial-build contains the MainActivity version for HCE and is titled as HCE Card Tool.
 - feature/reader-mode contains the MainActivity version for NFC reader functionality and is titled as NFC Reader Tool.
 
+![Screenshot 2024-10-28 at 11 55 09 AM](https://github.com/user-attachments/assets/6c8c208d-c8a6-436a-91ba-123d371e6201)
+![Screenshot 2024-10-28 at 11 55 16 AM](https://github.com/user-attachments/assets/d1f8ee06-ef21-4c7f-9efc-98b4ae7fe9ee)
+
+
 Usage steps:
 1. two physical Android devices with NFC hardware are required.
 2. check out the feature/initial-build branch and run the app on one of the two devices.
